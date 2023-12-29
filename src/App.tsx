@@ -1,28 +1,21 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect } from 'react';
+import { Route, Switch } from 'react-router';
 import './App.css';
-import RclReact from './ros/rclreact';
-import ROSLIB from 'roslib';
+import RCLReact from './ros/rclreact';
+import DashboardPage from './page/dashBoard/DashBoard';
 
 function App() {
-  const [chatter, setChatter] = useState<string>('');
-
-  const rclReact: RclReact = new RclReact();
-  rclReact.rclReactInit();
-  const subscription: ROSLIB.Topic = rclReact.createSubscription('/chatter', 'std_msgs/msg/String');
-  subscription.subscribe(function(result) {
-    const chatterCallback: any = JSON.parse(JSON.stringify(result));
-    console.log(`chatterCallback : ${JSON.stringify(chatterCallback)}`);
-    setChatter(chatterCallback.data);
-  });
 
   useEffect(() => {
-    
+    const rclReact: RCLReact = new RCLReact();
+    rclReact.rclReactInit();
   }, []);
 
   return (
     <div className="App">
-      hi
-      <h1>{chatter}</h1>
+      <Switch>
+        <Route exact path={'/'} component={DashboardPage} />
+      </Switch>
     </div>
   );
 }

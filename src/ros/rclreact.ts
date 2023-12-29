@@ -3,7 +3,7 @@ import ROSLIB, { Ros } from "roslib";
 const rclReactUrl: string = 'ws://localhost:9090'
 const rosLibRos : ROSLIB.Ros = new ROSLIB.Ros({url: rclReactUrl});
 
-export default class RclReact {
+export default class RCLReact {
     
     public rclReactInit(): void {
         if(!rosLibRos.isConnected) {
