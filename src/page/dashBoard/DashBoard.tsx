@@ -1,11 +1,10 @@
 import React from 'react';
 import RCLReact from '../../ros/rclreact';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect } from 'react';
 import * as THREE from "three";
-import { Canvas, useFrame, extend, useThree, RootState, ThreeElements } from "@react-three/fiber";
+import { extend } from "@react-three/fiber";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 extend({ OrbitControls });
-
 
 export default function DashboardPage() {
     const renderer: THREE.WebGLRenderer = new THREE.WebGLRenderer();
@@ -24,10 +23,16 @@ export default function DashboardPage() {
 
     function setAxesHelper(): void {
         const axesHelper: THREE.AxesHelper = new THREE.AxesHelper(3);
-        axesHelper.position.setX(0);
-        axesHelper.position.setY(0);
-        axesHelper.position.setZ(0);
+        axesHelper.position.set(0, 0, 0);
         scene.add(axesHelper);
+    }
+
+    function setSLAM(): void {
+        const map: THREE.Texture = new THREE.TextureLoader().load("map.png");
+        const material: THREE.SpriteMaterial = new THREE.SpriteMaterial({ map: map, color: 0xffffff });
+        const sprite: THREE.Sprite = new THREE.Sprite(material);
+
+        scene.add(sprite);
     }
 
     function setGridHelper(): void {
@@ -52,6 +57,7 @@ export default function DashboardPage() {
 
     useEffect(() => {
         setAxesHelper();
+        setSLAM();
         setGridHelper();
         animate();
     }, []);
