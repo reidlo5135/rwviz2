@@ -1,8 +1,9 @@
 import { useEffect } from 'react';
 import { Route, Switch } from 'react-router';
 import './App.css';
+import Universe from './components/universe/Universe';
 import RCLReact from './ros/rclreact';
-import DashboardPage from './page/dashBoard/DashBoard';
+import DashBoardPage from './page/dashboard/DashBoardPage';
 
 function App() {
 
@@ -14,7 +15,7 @@ function App() {
   return (
     <div className="App">
       <Switch>
-        <Route exact path={'/'} component={DashboardPage} />
+        <Route exact path={'/'} component={DashBoardPage} />
       </Switch>
     </div>
   );
