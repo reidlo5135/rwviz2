@@ -1,0 +1,38 @@
+{
+  "name": "ros2_web_bridge",
+  "version": "1.0.0",
+  "description": "ROS2-Web-Bridge",
+  "keywords": [],
+  "author": "wavem-reidlo",
+  "license": "Apache License 2.0",
+  "scripts": {
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin": {
+    "generate-ros-messages": "node_modules/.bin/generate-ros-messages"
+  },
+  "dependencies": {
+    "commander": "^5.0.0",
+    "debug": "^4.1.1",
+    "rclnodejs": "^0.21.4",
+    "uuid": "^7.0.2",
+    "winston": "^3.8.2",
+    "winston-daily-rotate-file": "^4.7.1"
+  },
+  "devDependencies": {
+    "@types/debug": "^4.1.7",
+    "@types/node": "ts4.5",
+    "@types/uuid": "^9.0.1",
+    "@types/ws": "^8.5.4",
+    "async": "^3.2.0",
+    "eslint": "^6.8.0",
+    "express": "^4.16.2",
+    "js-sha512": "^0.8.0",
+    "jsdom": "^16.2.1",
+    "mocha": "^7.1.1",
+    "puppeteer": "^2.1.1",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.5.0"
+  }
+}

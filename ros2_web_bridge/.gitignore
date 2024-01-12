@@ -1,0 +1,8 @@
+node_modules
+.vscode
+GETTING-STARTED.md
+package-lock.json
+build
+install
+log
+dist
