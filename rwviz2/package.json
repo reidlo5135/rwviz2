@@ -13,8 +13,6 @@
     "@types/react-dom": "^18.2.15",
     "concurrently": "^8.2.2",
     "fs": "^0.0.1-security",
-    "leaflet": "^1.9.4",
-    "maplibre-gl": "^1.15.3",
     "pgmjs": "^1.1.5",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

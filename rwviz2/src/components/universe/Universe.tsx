@@ -3,7 +3,12 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import URDFLoader, { URDFRobot } from 'urdf-loader';
 
-export default function Universe() {
+interface UniverseProps {
+    isURDFLoaded: boolean;
+    isSLAMLoaded: boolean;
+}
+
+const Universe: React.FC<UniverseProps> = ({ isURDFLoaded, isSLAMLoaded }) => {
     let renderer: THREE.WebGLRenderer;
     let scene: THREE.Scene;
     let camera: THREE.PerspectiveCamera;
@@ -11,7 +16,7 @@ export default function Universe() {
 
     const [robot, setRobot] = useState<THREE.Group>();
 
-    function setUpScene(container: HTMLElement) {
+    const setUpScene = (container: HTMLElement): void => {
         renderer = new THREE.WebGLRenderer();
         renderer.setSize(container.offsetWidth, container.offsetHeight);
         container.appendChild(renderer.domElement);
@@ -25,7 +30,7 @@ export default function Universe() {
 
         controls.update();
 
-        container.addEventListener("resize", () => {
+        container.addEventListener('resize', () => {
             renderer.setSize(container.offsetWidth, container.offsetHeight);
             camera.aspect = container.offsetWidth / container.offsetHeight;
             camera.updateProjectionMatrix();
@@ -33,45 +38,37 @@ export default function Universe() {
 
         setAxesHelper();
         setGridHelper();
-        setSLAM();
-    }
+    };
 
-    function setAxesHelper(): void {
+    const setAxesHelper = (): void => {
         const axesHelper: THREE.AxesHelper = new THREE.AxesHelper(3);
         axesHelper.position.set(0, 0, 0);
         scene.add(axesHelper);
-    }
+    };
 
-    function setGridHelper(): void {
+    const setGridHelper = (): void => {
         const size: number = 10;
         const divisions: number = 10;
 
         const gridHelper: THREE.GridHelper = new THREE.GridHelper(size, divisions);
         scene.add(gridHelper);
-    }
+    };
 
-    const onSelectURDF = (e: any): void => {
-        e.preventDefault();
-        e.persist();
+    const loadSLAM = (): void => {
+        if (isSLAMLoaded) {
 
-        const selectedURDF: any = e.target.files[0];
-
-        if (selectedURDF) {
-            const blob: Blob = new Blob([selectedURDF], { type: "application/xml" });
-            localStorage.setItem("urdf", URL.createObjectURL(blob));
-            loadURDF();
         }
-    }
+        const slamURL: string = localStorage.getItem('slam')!.toString();
+        console.log(`slamURL : ${slamURL}`);
 
-    function setSLAM(): void {
-        const map: THREE.Texture = new THREE.TextureLoader().load("map/wk_valve.png");
+        const map: THREE.Texture = new THREE.TextureLoader().load(slamURL);
         const mapWidth: number = 1148 * 0.05;
         const mapHeight: number = 713 * 0.05;
 
         const box: THREE.BoxGeometry = new THREE.BoxGeometry(mapWidth, mapHeight, 0);
         const ms: THREE.MeshBasicMaterial = new THREE.MeshBasicMaterial({
             map: map,
-            color: 0xffffff
+            color: 0xffffff,
         });
 
         const mesh: THREE.Mesh = new THREE.Mesh(box, ms);
@@ -82,92 +79,96 @@ export default function Universe() {
         mesh.rotation.x = -(Math.PI / 2);
 
         scene.add(mesh);
-    }
+    };
 
-    function loadURDF(): void {
-        const manager = new THREE.LoadingManager();
-        const loader = new URDFLoader(manager);
+    const loadURDF = (): void => {
+        if (isURDFLoaded) {
+            const manager = new THREE.LoadingManager();
+            const loader = new URDFLoader(manager);
 
-        loader.packages = {
-            packageName: "/"
-        };
+            loader.packages = {
+                packageName: '/',
+            };
 
-        const urdfURL: string = localStorage.getItem("urdf")!.toString();
-        console.log(`urdfURL : ${urdfURL}`);
+            const urdfURL: string = localStorage.getItem('urdf')!.toString();
+            console.log(`urdfURL : ${urdfURL}`);
 
-        loader.load(urdfURL, (robot: URDFRobot) => {
-            console.log(`robot : ${JSON.stringify(robot)}`);
+            loader.load(urdfURL, (robot: URDFRobot) => {
+                console.log(`robot : ${JSON.stringify(robot)}`);
 
-            const robotGroup: THREE.Group = new THREE.Group();
-            robot.traverse((child: any) => {
-                const childJson: any = JSON.parse(JSON.stringify(child));
+                const robotGroup: THREE.Group = new THREE.Group();
+                robot.traverse((child: any) => {
+                    const childJson: any = JSON.parse(JSON.stringify(child));
 
-                if (child instanceof THREE.Mesh) {
-                    const colorTag: string = childJson.materials[0].name.toLocaleLowerCase();
+                    if (child instanceof THREE.Mesh) {
+                        const colorTag: string = childJson.materials[0].name.toLocaleLowerCase();
 
-                    switch (colorTag) {
-                        case "black":
-                            child.material = new THREE.MeshBasicMaterial({ color: 0x00000 });
-                            break;
-                        case "light_black":
-                            child.material = new THREE.MeshBasicMaterial({ color: 0x00000 });
-                            break;
-                        case "blue":
-                            child.material = new THREE.MeshBasicMaterial({ color: 0x0000ff });
-                            break;
-                        case "red":
-                            child.material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-                            break;
-                        default:
-                            child.material = new THREE.MeshBasicMaterial({ color: 0x00000 });
-                            break;
+                        switch (colorTag) {
+                            case 'black':
+                                child.material = new THREE.MeshBasicMaterial({ color: 0x00000 });
+                                break;
+                            case 'light_black':
+                                child.material = new THREE.MeshBasicMaterial({ color: 0x00000 });
+                                break;
+                            case 'blue':
+                                child.material = new THREE.MeshBasicMaterial({ color: 0x0000ff });
+                                break;
+                            case 'red':
+                                child.material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+                                break;
+                            default:
+                                child.material = new THREE.MeshBasicMaterial({ color: 0x00000 });
+                                break;
+                        }
+                        child.material.transparent = true;
+                        child.material.opacity = 1.0;
                     }
-                    child.material.transparent = true;
-                    child.material.opacity = 1.0;
-                }
-                child.castShadow = true;
+                    child.castShadow = true;
+                });
+
+                robotGroup.add(robot);
+                setRobot(robotGroup);
+                robotGroup.position.set(0, 0.1, 0);
+                robotGroup.rotateX(-(Math.PI / 2));
+
+                scene.add(robotGroup);
             });
+        }
+    };
 
-            robotGroup.add(robot);
-            setRobot(robotGroup);
-            robotGroup.position.set(0, 0.1, 0);
-            robotGroup.rotateX(-(Math.PI / 2));
-
-            scene.add(robotGroup);
-        });
-    }
-
-    function animate(): void {
+    const animate = (): void => {
         requestAnimationFrame(animate);
         controls.update();
         renderer.render(scene, camera);
-    }
+    };
 
     useEffect(() => {
-        const container: HTMLElement | null = document.getElementById("universe_container");
+        const container: HTMLElement | null = document.getElementById('universe_container');
 
         if (container) {
             setUpScene(container);
             animate();
+
+            if (isURDFLoaded) {
+                loadURDF();
+            }
+
+            if (isSLAMLoaded) {
+                loadSLAM();
+            }
         }
 
         return () => {
             container!.removeChild(renderer.domElement);
-            setUpScene(container!);
             loadURDF();
         };
-    }, []);
+    }, [isURDFLoaded, isSLAMLoaded]);
 
     return (
         <div>
-            <div className="urdf_container">
-                <div>
-                    <h3>urdf</h3>
-                    <input type='file' name='urdf' onChange={onSelectURDF} accept='.urdf, .URDF' />
-                </div>
-            </div>
-            <div id='universe_container' className='universe_container'>
-            </div>
+            <div id='universe_container' className='universe_container'></div>
         </div>
     );
-}
+};
+
+export default Universe;
