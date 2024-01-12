@@ -21,6 +21,10 @@ export default class RCLReact {
         });
     }
 
+    public isConnected(): boolean {
+        return rosLibRos.isConnected;
+    }
+
     public createPublisher(topic: string, messageType: string): ROSLIB.Topic {
         const publisher: ROSLIB.Topic = new ROSLIB.Topic({
             ros: rosLibRos,
@@ -32,10 +36,12 @@ export default class RCLReact {
     }
 
     public createSubscription(topic: string, messageType: string): ROSLIB.Topic {
+        console.log(`RCLReact createSubscription topic : ${topic}, messageType : ${messageType}`);
         const subscription: ROSLIB.Topic = new ROSLIB.Topic({
             ros: rosLibRos,
             name: topic,
-            messageType: messageType
+            messageType: messageType,
+            queue_size: 10
         });
 
         return subscription;

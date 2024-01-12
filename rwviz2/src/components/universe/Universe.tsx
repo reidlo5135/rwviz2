@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
+import ROSLIB from 'roslib';
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import URDFLoader, { URDFRobot } from 'urdf-loader';
+import RCLReact from '../../ros/rclreact';
 
 interface UniverseProps {
     isURDFLoaded: boolean;
@@ -9,12 +11,14 @@ interface UniverseProps {
 }
 
 const Universe: React.FC<UniverseProps> = ({ isURDFLoaded, isSLAMLoaded }) => {
+    const rclReact: RCLReact = new RCLReact();
     let renderer: THREE.WebGLRenderer;
     let scene: THREE.Scene;
     let camera: THREE.PerspectiveCamera;
     let controls: OrbitControls;
 
     const [robot, setRobot] = useState<THREE.Group>();
+    const [mapSubscription, setMapSubscription] = useState<ROSLIB.Topic | null>();
 
     const setUpScene = (container: HTMLElement): void => {
         renderer = new THREE.WebGLRenderer();
@@ -55,30 +59,71 @@ const Universe: React.FC<UniverseProps> = ({ isURDFLoaded, isSLAMLoaded }) => {
     };
 
     const loadSLAM = (): void => {
-        if (isSLAMLoaded) {
+        console.log(`SLAM `);
 
-        }
-        const slamURL: string = localStorage.getItem('slam')!.toString();
-        console.log(`slamURL : ${slamURL}`);
+        const rclMapSubscription: ROSLIB.Topic = rclReact.createSubscription('/map', 'nav_msgs/msg/OccupancyGrid');
+        setMapSubscription(rclMapSubscription);
 
-        const map: THREE.Texture = new THREE.TextureLoader().load(slamURL);
-        const mapWidth: number = 1148 * 0.05;
-        const mapHeight: number = 713 * 0.05;
+        mapSubscription?.subscribe(function (occupancyGrid: any) {
+            const occupancyGridJson: any = JSON.parse(JSON.stringify(occupancyGrid));
+            console.log(`occupancyGridJson : ${JSON.stringify(occupancyGridJson)}`);
+            const rawWidth: number = occupancyGridJson.info.width;
+            const rawHeight: number = occupancyGridJson.info.height;
+            const data: Array<number> = occupancyGridJson.data;
+            const buffer: Uint8ClampedArray = new Uint8ClampedArray(rawWidth * rawHeight * 4);
 
-        const box: THREE.BoxGeometry = new THREE.BoxGeometry(mapWidth, mapHeight, 0);
-        const ms: THREE.MeshBasicMaterial = new THREE.MeshBasicMaterial({
-            map: map,
-            color: 0xffffff,
+            console.log(`SLAM width : ${rawWidth}, height : ${rawHeight}`);
+
+            for (let i = 0; i < buffer.length; i += 4) {
+                const index: number = Math.floor(i / 4);
+                if (data[index] === -1) {
+                    buffer[i] = 220;
+                    buffer[i + 1] = 220;
+                    buffer[i + 2] = 220;
+                    buffer[i + 3] = 230;
+                } else if (data[index] === 0) {
+                    buffer[i] = 255;
+                    buffer[i + 1] = 255;
+                    buffer[i + 2] = 255;
+                    buffer[i + 3] = 230;
+                } else if (data[index] === 100) {
+                    buffer[i] = 0;
+                    buffer[i + 3] = 255;
+                };
+            };
+
+            const texture = new THREE.DataTexture(buffer, rawWidth, rawHeight);
+            texture.needsUpdate = true;
+
+            const geometry = new THREE.BoxGeometry(rawWidth * 0.05, rawHeight * 0.05, 0);
+            const material = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide });
+            const mesh = new THREE.Mesh(geometry, material);
+            mesh.position.set(0, 0.1, 0);
+            mesh.rotation.x = -(Math.PI / 2);
+            scene.add(mesh);
         });
 
-        const mesh: THREE.Mesh = new THREE.Mesh(box, ms);
-        mesh.position.x = 0;
-        mesh.position.y = 0.1;
-        mesh.position.z = 0;
+        // const slamURL: string = localStorage.getItem('slam')!.toString();
+        // console.log(`slamURL : ${slamURL}`);
 
-        mesh.rotation.x = -(Math.PI / 2);
+        // const mapTexture: THREE.Texture = new THREE.TextureLoader().load(slamURL);
+        // const mapWidth: number = 1148 * 0.05;
+        // const mapHeight: number = 713 * 0.05;
 
-        scene.add(mesh);
+        // const box: THREE.BoxGeometry = new THREE.BoxGeometry(mapWidth, mapHeight, 0);
+        // const ms: THREE.MeshBasicMaterial = new THREE.MeshBasicMaterial({
+        //     map: mapTexture,
+        //     color: 0xffffff,
+        // });
+
+        // const mesh: THREE.Mesh = new THREE.Mesh(box, ms);
+        // mesh.position.x = 0;
+        // mesh.position.y = 0.1;
+        // mesh.position.z = 0;
+
+        // mesh.rotation.x = -(Math.PI / 2);
+
+        // scene.add(mesh);
     };
 
     const loadURDF = (): void => {
@@ -128,7 +173,7 @@ const Universe: React.FC<UniverseProps> = ({ isURDFLoaded, isSLAMLoaded }) => {
 
                 robotGroup.add(robot);
                 setRobot(robotGroup);
-                robotGroup.position.set(0, 0.1, 0);
+                robotGroup.position.set(0, 0, 0);
                 robotGroup.rotateX(-(Math.PI / 2));
 
                 scene.add(robotGroup);
@@ -155,6 +200,8 @@ const Universe: React.FC<UniverseProps> = ({ isURDFLoaded, isSLAMLoaded }) => {
 
             if (isSLAMLoaded) {
                 loadSLAM();
+            } else {
+                mapSubscription?.unsubscribe();
             }
         }
 
@@ -163,6 +210,10 @@ const Universe: React.FC<UniverseProps> = ({ isURDFLoaded, isSLAMLoaded }) => {
             loadURDF();
         };
     }, [isURDFLoaded, isSLAMLoaded]);
+
+    useEffect(() => {
+
+    }, []);
 
     return (
         <div>

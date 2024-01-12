@@ -19,21 +19,23 @@ const TopicsBar: React.FC<TopicsBarProps> = ({ onURDFLoad, onSLAMLoad }) => {
     };
 
     const handleSelectSLAM = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        e.preventDefault();
-        const selectedSLAM = e.target.files && e.target.files[0];
+        const isChecked: boolean = e.target.checked;
+        onSLAMLoad(isChecked);
 
-        if (selectedSLAM) {
-            const blob: Blob = new Blob([selectedSLAM], { type: "img/png" });
-            const slamString: string = URL.createObjectURL(blob);
-            localStorage.setItem("slam", slamString);
-            onSLAMLoad(true);
-        }
+        // const selectedSLAM = e.target.files && e.target.files[0];
+
+        // if (selectedSLAM) {
+        //     const blob: Blob = new Blob([selectedSLAM], { type: "img/png" });
+        //     const slamString: string = URL.createObjectURL(blob);
+        //     localStorage.setItem("slam", slamString);
+        //     onSLAMLoad(true);
+        // }
     };
 
     return (
         <div className="topics_bar_container">
             <div className="urdf_container">
-                <h3>urdf</h3>
+                <h3>URDF</h3>
                 <input
                     type='file'
                     name='urdf'
@@ -45,7 +47,7 @@ const TopicsBar: React.FC<TopicsBarProps> = ({ onURDFLoad, onSLAMLoad }) => {
             <div className="slam_container">
                 <h3>SLAM</h3>
                 <input
-                    type='file'
+                    type='checkbox'
                     name='slam'
                     onChange={handleSelectSLAM}
                     accept='.pgm, .png'
