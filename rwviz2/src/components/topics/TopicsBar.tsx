@@ -20,16 +20,8 @@ const TopicsBar: React.FC<TopicsBarProps> = ({ onURDFLoad, onSLAMLoad }) => {
 
     const handleSelectSLAM = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const isChecked: boolean = e.target.checked;
+        console.log(`handleSelectSLAM isChecked : ${isChecked}`);
         onSLAMLoad(isChecked);
-
-        // const selectedSLAM = e.target.files && e.target.files[0];
-
-        // if (selectedSLAM) {
-        //     const blob: Blob = new Blob([selectedSLAM], { type: "img/png" });
-        //     const slamString: string = URL.createObjectURL(blob);
-        //     localStorage.setItem("slam", slamString);
-        //     onSLAMLoad(true);
-        // }
     };
 
     return (
@@ -50,7 +42,6 @@ const TopicsBar: React.FC<TopicsBarProps> = ({ onURDFLoad, onSLAMLoad }) => {
                     type='checkbox'
                     name='slam'
                     onChange={handleSelectSLAM}
-                    accept='.pgm, .png'
                 />
             </div>
         </div>

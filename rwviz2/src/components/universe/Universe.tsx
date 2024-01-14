@@ -26,7 +26,7 @@ const Universe: React.FC<UniverseProps> = ({ isURDFLoaded, isSLAMLoaded }) => {
         container.appendChild(renderer.domElement);
 
         scene = new THREE.Scene();
-        camera = new THREE.PerspectiveCamera(115, container.offsetWidth / container.offsetHeight, 1, 10000);
+        camera = new THREE.PerspectiveCamera(70, container.offsetWidth / container.offsetHeight, 1, 10000);
         controls = new OrbitControls(camera, renderer.domElement);
 
         camera.position.set(0, 20, 100);
@@ -69,10 +69,12 @@ const Universe: React.FC<UniverseProps> = ({ isURDFLoaded, isSLAMLoaded }) => {
             console.log(`occupancyGridJson : ${JSON.stringify(occupancyGridJson)}`);
             const rawWidth: number = occupancyGridJson.info.width;
             const rawHeight: number = occupancyGridJson.info.height;
+            const resolution: number = occupancyGridJson.info.resolution;
+
             const data: Array<number> = occupancyGridJson.data;
             const buffer: Uint8ClampedArray = new Uint8ClampedArray(rawWidth * rawHeight * 4);
 
-            console.log(`SLAM width : ${rawWidth}, height : ${rawHeight}`);
+            console.log(`SLAM width : ${rawWidth}, height : ${rawHeight}, resoultion : ${resolution}`);
 
             for (let i = 0; i < buffer.length; i += 4) {
                 const index: number = Math.floor(i / 4);
@@ -95,35 +97,13 @@ const Universe: React.FC<UniverseProps> = ({ isURDFLoaded, isSLAMLoaded }) => {
             const texture = new THREE.DataTexture(buffer, rawWidth, rawHeight);
             texture.needsUpdate = true;
 
-            const geometry = new THREE.BoxGeometry(rawWidth * 0.05, rawHeight * 0.05, 0);
+            const geometry = new THREE.BoxGeometry(rawWidth * resolution, rawHeight * resolution, 0);
             const material = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide });
             const mesh = new THREE.Mesh(geometry, material);
-            mesh.position.set(0, 0.1, 0);
+            mesh.position.set(0, 0, 0);
             mesh.rotation.x = -(Math.PI / 2);
             scene.add(mesh);
         });
-
-        // const slamURL: string = localStorage.getItem('slam')!.toString();
-        // console.log(`slamURL : ${slamURL}`);
-
-        // const mapTexture: THREE.Texture = new THREE.TextureLoader().load(slamURL);
-        // const mapWidth: number = 1148 * 0.05;
-        // const mapHeight: number = 713 * 0.05;
-
-        // const box: THREE.BoxGeometry = new THREE.BoxGeometry(mapWidth, mapHeight, 0);
-        // const ms: THREE.MeshBasicMaterial = new THREE.MeshBasicMaterial({
-        //     map: mapTexture,
-        //     color: 0xffffff,
-        // });
-
-        // const mesh: THREE.Mesh = new THREE.Mesh(box, ms);
-        // mesh.position.x = 0;
-        // mesh.position.y = 0.1;
-        // mesh.position.z = 0;
-
-        // mesh.rotation.x = -(Math.PI / 2);
-
-        // scene.add(mesh);
     };
 
     const loadURDF = (): void => {
@@ -170,6 +150,8 @@ const Universe: React.FC<UniverseProps> = ({ isURDFLoaded, isSLAMLoaded }) => {
                     }
                     child.castShadow = true;
                 });
+
+                robot.scale.set(0.1, 0.1, 0.1);
 
                 robotGroup.add(robot);
                 setRobot(robotGroup);
