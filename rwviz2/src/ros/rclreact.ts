@@ -1,7 +1,7 @@
 import ROSLIB from "roslib";
 
-// const rclReactUrl: string = 'ws://192.168.0.187:9090';
-const rclReactUrl: string = 'ws://192.168.56.1:9090';
+const rclReactUrl: string = 'ws://192.168.0.187:9090';
+// const rclReactUrl: string = 'ws://192.168.56.1:9090';
 const rosLibRos : ROSLIB.Ros = new ROSLIB.Ros({url: rclReactUrl});
 
 export default class RCLReact {
