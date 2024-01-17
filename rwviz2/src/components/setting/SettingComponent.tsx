@@ -1,5 +1,5 @@
 import React from 'react';
-import "./SettingsComponent.css";
+import "./SettingComponent.css";
 
 interface SettingsComponentProps {
     onURDFLoad: (isURDFLoaded: boolean) => void;
@@ -7,7 +7,8 @@ interface SettingsComponentProps {
 };
 
 const SettingsComponent: React.FC<SettingsComponentProps> = ({ onURDFLoad, onSLAMLoad }) => {
-    const handleSelectURDF = async (e: React.ChangeEvent<HTMLInputElement>) => {
+
+    const handleSelectURDF = async (e: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
         e.preventDefault();
         const selectedURDF = e.target.files && e.target.files[0];
 
@@ -19,14 +20,14 @@ const SettingsComponent: React.FC<SettingsComponentProps> = ({ onURDFLoad, onSLA
         }
     };
 
-    const handleSelectSLAM = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleSelectSLAM = async (e: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
         const isChecked: boolean = e.target.checked;
         console.log(`handleSelectSLAM isChecked : ${isChecked}`);
         onSLAMLoad(isChecked);
     };
 
     return (
-        <div className="settings_container">
+        <div className="setting_container">
             <div className="urdf_container">
                 <h3>URDF</h3>
                 <input

@@ -2,6 +2,19 @@
     width: 1920px;
     height: 1080px;
     display: flex;
+    flex-direction: column;
     margin: 0 auto;
     background-color: white;
+}
+
+.top_component_container, .main_container {
+    flex: 1;
+}
+
+.main_container {
+    display: flex;
+}
+
+.universe_component_container {
+    height: 900px;
 }

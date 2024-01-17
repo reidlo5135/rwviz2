@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
 import ROSLIB from 'roslib';
 import * as THREE from "three";
+import Stats from 'stats.js';
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import URDFLoader, { URDFRobot } from 'urdf-loader';
 import RCLReact from '../../ros/rclreact';
 import "./UniverseComponent.css";
+import { stat } from 'fs';
 
 interface UniverseComponentProps {
     isURDFLoaded: boolean;
@@ -13,6 +15,7 @@ interface UniverseComponentProps {
 
 const UniverseComponent: React.FC<UniverseComponentProps> = ({ isURDFLoaded, isSLAMLoaded }) => {
     const rclReact: RCLReact = new RCLReact();
+    const stats: Stats = new Stats();
     let renderer: THREE.WebGLRenderer;
     let scene: THREE.Scene;
     let camera: THREE.PerspectiveCamera;
@@ -164,9 +167,17 @@ const UniverseComponent: React.FC<UniverseComponentProps> = ({ isURDFLoaded, isS
         }
     };
 
+    const showFPS = (container: HTMLElement | null): void => {
+        stats.begin();
+        stats.showPanel(0);
+        stats.dom.style.position = "relative";
+        container?.appendChild(stats.dom);
+    };
+
     const animate = (): void => {
         requestAnimationFrame(animate);
         controls.update();
+        stats.update();
         renderer.render(scene, camera);
     };
 
@@ -188,19 +199,26 @@ const UniverseComponent: React.FC<UniverseComponentProps> = ({ isURDFLoaded, isS
             }
         }
 
-        return () => {
+        return (): void => {
             container!.removeChild(renderer.domElement);
             loadURDF();
         };
     }, [isURDFLoaded, isSLAMLoaded]);
 
     useEffect(() => {
+        const container: HTMLElement | null = document.getElementById('fps_container');
 
+        showFPS(container);
+        return (): void => {
+            stats.end();
+            container!.removeChild(stats.dom);
+        };
     }, []);
 
     return (
         <div>
             <div id='universe_container' className='universe_container'></div>
+            <div id='fps_container' className='fps_container'></div>
         </div>
     );
 };

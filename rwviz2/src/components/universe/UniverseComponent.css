@@ -1,5 +1,13 @@
 #universe_container {
     width: 1280px;
-    height: 768px;
+    height: 900px;
     overflow: hidden;
+}
+
+.fps_container {
+    overflow: hidden;
+}
+
+.fps_container > div {
+    
 }
