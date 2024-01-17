@@ -1,11 +1,12 @@
 import React from 'react';
+import "./SettingsComponent.css";
 
-interface TopicsBarProps {
+interface SettingsComponentProps {
     onURDFLoad: (isURDFLoaded: boolean) => void;
     onSLAMLoad: (isSLAMLoaded: boolean) => void;
-}
+};
 
-const TopicsBar: React.FC<TopicsBarProps> = ({ onURDFLoad, onSLAMLoad }) => {
+const SettingsComponent: React.FC<SettingsComponentProps> = ({ onURDFLoad, onSLAMLoad }) => {
     const handleSelectURDF = async (e: React.ChangeEvent<HTMLInputElement>) => {
         e.preventDefault();
         const selectedURDF = e.target.files && e.target.files[0];
@@ -25,7 +26,7 @@ const TopicsBar: React.FC<TopicsBarProps> = ({ onURDFLoad, onSLAMLoad }) => {
     };
 
     return (
-        <div className="topics_bar_container">
+        <div className="settings_container">
             <div className="urdf_container">
                 <h3>URDF</h3>
                 <input
@@ -35,7 +36,6 @@ const TopicsBar: React.FC<TopicsBarProps> = ({ onURDFLoad, onSLAMLoad }) => {
                     accept='.urdf, .URDF'
                 />
             </div>
-
             <div className="slam_container">
                 <h3>SLAM</h3>
                 <input
@@ -48,4 +48,4 @@ const TopicsBar: React.FC<TopicsBarProps> = ({ onURDFLoad, onSLAMLoad }) => {
     );
 }
 
-export default TopicsBar;
+export default SettingsComponent;

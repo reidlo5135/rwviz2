@@ -4,13 +4,14 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import URDFLoader, { URDFRobot } from 'urdf-loader';
 import RCLReact from '../../ros/rclreact';
+import "./UniverseComponent.css";
 
-interface UniverseProps {
+interface UniverseComponentProps {
     isURDFLoaded: boolean;
     isSLAMLoaded: boolean;
-}
+};
 
-const Universe: React.FC<UniverseProps> = ({ isURDFLoaded, isSLAMLoaded }) => {
+const UniverseComponent: React.FC<UniverseComponentProps> = ({ isURDFLoaded, isSLAMLoaded }) => {
     const rclReact: RCLReact = new RCLReact();
     let renderer: THREE.WebGLRenderer;
     let scene: THREE.Scene;
@@ -204,4 +205,4 @@ const Universe: React.FC<UniverseProps> = ({ isURDFLoaded, isSLAMLoaded }) => {
     );
 };
 
-export default Universe;
+export default UniverseComponent;

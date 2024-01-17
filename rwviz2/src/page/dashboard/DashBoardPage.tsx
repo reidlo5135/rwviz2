@@ -1,7 +1,7 @@
 import { useState } from "react";
+import SettingsComponent from "../../components/settings/SettingsComponent";
 import Top from "../../components/top/Top";
-import TopicsBar from "../../components/topics/TopicsBar";
-import Universe from "../../components/universe/Universe";
+import UniverseComponent from "../../components/universe/UniverseComponent";
 import "./DashBoardStyle.css";
 
 export default function DashBoardPage() {
@@ -21,8 +21,8 @@ export default function DashBoardPage() {
     return (
         <div className="dashboard_container">
             <Top />
-            <TopicsBar onURDFLoad={handleURDFLoad} onSLAMLoad={handleSLAMLoad} />
-            <Universe isURDFLoaded={isURDFLoaded!} isSLAMLoaded={isSLAMLoaded!} />
+            <SettingsComponent onURDFLoad={handleURDFLoad} onSLAMLoad={handleSLAMLoad} />
+            <UniverseComponent isURDFLoaded={isURDFLoaded!} isSLAMLoaded={isSLAMLoaded!} />
         </div>
     );
 };
